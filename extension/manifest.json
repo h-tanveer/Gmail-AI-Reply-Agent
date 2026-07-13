@@ -1,0 +1,44 @@
+{
+    "manifest_version": 3,
+    "name": "Gmail AI Reply Agent",
+    "version": "1.0.0",
+    "minimum_chrome_version": "120",
+    "description": "Generate professional AI email replies inside Gmail.",
+    "permissions": [
+        "storage",
+        "identity",
+        "alarms"
+    ],
+    "host_permissions": [
+        "https://mail.google.com/*",
+        "https://gmail.googleapis.com/*",
+        "http://localhost:3000/*"
+    ],
+    "oauth2": {
+        "client_id": "838442773055-omq6sh66ik4sjf01plm9fd7du8so2cjq.apps.googleusercontent.com",
+        "scopes": [
+            "https://www.googleapis.com/auth/gmail.readonly",
+            "https://www.googleapis.com/auth/gmail.compose"
+        ]
+    },
+    "action": {
+        "default_title": "Gmail AI Reply Agent",
+        "default_popup": "popup/popup.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://mail.google.com/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "styles.css"
+            ]
+        }
+    ]
+}

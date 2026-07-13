@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Gmail AI Reply Agent</title>
+
+    <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+    <main class="popup-container">
+
+        <header class="header">
+            <div class="logo">
+                AI
+            </div>
+
+            <div>
+                <h1>Gmail AI Agent</h1>
+                <p>Professional email replies</p>
+            </div>
+        </header>
+
+        <section class="status-card">
+            <div class="status-row">
+                <span id="statusIndicator" class="status-indicator disconnected"></span>
+
+                <div>
+                    <h2 id="connectionTitle">
+                        Gmail not connected
+                    </h2>
+
+                    <p id="connectionMessage">
+                        Connect your Gmail account to start.
+                    </p>
+                </div>
+            </div>
+
+            <button id="connectButton" type="button" class="primary-button">
+                Connect Gmail
+            </button>
+        </section>
+
+        <section class="settings-card">
+            <div class="settings-header">
+                <div>
+                    <h2>Reply Settings</h2>
+                    <p>Customize how AI writes your email replies.</p>
+                </div>
+            </div>
+
+            <label class="settings-field">
+                <span>Reply Tone</span>
+
+                <select id="replyTone">
+                    <option value="professional">
+                        Professional
+                    </option>
+
+                    <option value="friendly">
+                        Friendly
+                    </option>
+
+                    <option value="formal">
+                        Formal
+                    </option>
+
+                    <option value="concise">
+                        Concise
+                    </option>
+                </select>
+            </label>
+
+            <label class="settings-field">
+                <span>Reply Length</span>
+
+                <select id="replyLength">
+                    <option value="short">
+                        Short
+                    </option>
+
+                    <option value="medium">
+                        Medium
+                    </option>
+
+                    <option value="detailed">
+                        Detailed
+                    </option>
+                </select>
+            </label>
+
+            <label class="settings-field">
+                <span>Your Name</span>
+
+                <input
+                    id="userName"
+                    type="text"
+                    value="Hassan Tanveer"
+                    maxlength="100"
+                />
+            </label>
+
+            <label class="settings-field">
+                <span>Your Role</span>
+
+                <input
+                    id="userRole"
+                    type="text"
+                    value="Full-Stack Developer"
+                    maxlength="120"
+                />
+            </label>
+
+            <label class="settings-field">
+                <span>Email Signature</span>
+
+                <textarea
+                    id="emailSignature"
+                    rows="4"
+                    maxlength="500"
+                >Best regards,
+Hassan Tanveer</textarea>
+            </label>
+
+            <button
+                id="saveSettingsButton"
+                type="button"
+                class="secondary-button"
+            >
+                Save Reply Settings
+            </button>
+
+            <p
+                id="settingsStatus"
+                class="settings-status"
+            ></p>
+        </section>
+
+        <section class="auto-reply-card">
+            <div class="auto-reply-header">
+                <div>
+                    <h2>Automatic Reply Agent</h2>
+
+                    <p>
+                        Classify new emails and handle only low-risk replies.
+                    </p>
+                </div>
+
+                <label class="auto-reply-switch">
+                    <input
+                        id="autoReplyEnabled"
+                        type="checkbox"
+                    />
+
+                    <span>Enabled</span>
+                </label>
+            </div>
+
+            <label class="settings-field">
+                <span>Operation Mode</span>
+
+                <select id="autoReplyMode">
+                    <option value="dry_run">
+                        Dry Run &mdash; Create Drafts Only
+                    </option>
+
+                    <option value="auto_send">
+                        Auto Send &mdash; Safe Categories Only
+                    </option>
+                </select>
+            </label>
+
+            <div
+                id="autoReplyWarning"
+                class="auto-reply-warning"
+            >
+                Dry Run is recommended. Auto Send may send emails without manual approval.
+            </div>
+
+            <p class="auto-reply-meta">
+                Check interval:
+                <strong>Approximately every 30 seconds</strong>
+            </p>
+
+            <p class="auto-reply-meta">
+                Last check:
+                <span id="autoReplyLastCheck">Not checked yet</span>
+            </p>
+
+            <p class="auto-reply-meta">
+                Last result:
+                <span id="autoReplyLastResult">No result yet</span>
+            </p>
+
+            <p class="auto-reply-meta">
+                Safe low-risk messages may be sent automatically. Other reply-worthy messages are saved as Gmail Drafts for review.
+            </p>
+
+            <button
+                id="runAutoReplyCheckButton"
+                type="button"
+                class="secondary-button"
+            >
+                Check New Emails Now
+            </button>
+
+            <p
+                id="autoReplyStatus"
+                class="auto-reply-status"
+            ></p>
+        </section>
+
+        <section id="inboxCard" class="inbox-card">
+            <div class="inbox-header">
+                <div>
+                    <h2>Unread Emails</h2>
+
+                    <p>
+                        View your latest unread inbox messages.
+                    </p>
+                </div>
+
+                <span id="emailCount" class="email-count">
+                    0
+                </span>
+            </div>
+
+            <div class="inbox-actions">
+                <button
+                    id="checkInboxButton"
+                    type="button"
+                    class="secondary-button"
+                    disabled
+                >
+                    Check Inbox
+                </button>
+
+                <button
+                    id="refreshInboxButton"
+                    type="button"
+                    class="secondary-button"
+                    disabled
+                    hidden
+                >
+                    Refresh Inbox
+                </button>
+            </div>
+
+            <p id="inboxStatus" class="inbox-status">
+                Connect Gmail to check your inbox.
+            </p>
+
+            <div id="emailList" class="email-list"></div>
+
+            <button
+                id="loadMoreButton"
+                type="button"
+                class="secondary-button load-more-button"
+                hidden
+            >
+                Load More Emails
+            </button>
+        </section>
+
+        <section id="emailDetailsCard" class="email-details-card" hidden>
+            <div class="details-header">
+                <div>
+                    <h2 id="selectedEmailSubject">
+                        Email Details
+                    </h2>
+
+                    <p id="selectedEmailSender"></p>
+                </div>
+
+                <button id="closeEmailButton" type="button" class="close-button" aria-label="Close email">
+                    ×
+                </button>
+            </div>
+
+            <p id="emailDetailsStatus" class="email-details-status"></p>
+
+            <div id="threadMessages" class="thread-messages"></div>
+
+            <section
+                id="riskWarning"
+                class="risk-warning"
+                hidden
+            >
+                <div class="risk-warning-header">
+                    <span
+                        class="risk-warning-icon"
+                        aria-hidden="true"
+                    >
+                        !
+                    </span>
+
+                    <div>
+                        <h3 id="riskTitle">
+                            Sensitive Email Detected
+                        </h3>
+
+                        <p id="riskMessage">
+                            Review the generated reply carefully before creating a Gmail Draft.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    id="riskCategories"
+                    class="risk-categories"
+                ></div>
+
+                <label class="risk-review-row">
+                    <input
+                        id="riskReviewCheckbox"
+                        type="checkbox"
+                    />
+
+                    <span>
+                        I reviewed the generated reply and confirm that it is safe to save as a Gmail Draft.
+                    </span>
+                </label>
+            </section>
+
+            <div class="custom-instruction-section">
+                <label
+                    for="customReplyInstruction"
+                    class="custom-instruction-label"
+                >
+                    Custom Reply Instruction
+                </label>
+
+                <p class="custom-instruction-help">
+                    Optional: tell the AI what information or decision to include in the reply.
+                </p>
+
+                <textarea
+                    id="customReplyInstruction"
+                    rows="4"
+                    maxlength="1000"
+                    placeholder="Example: Tell them I am available tomorrow after 4 PM and ask them to share the meeting link."
+                ></textarea>
+
+                <div class="custom-instruction-footer">
+                    <span id="instructionCharacterCount">
+                        0 / 1000
+                    </span>
+
+                    <button
+                        id="clearInstructionButton"
+                        type="button"
+                        class="text-button"
+                        disabled
+                    >
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <button id="generateReplyButton" type="button" class="primary-button" disabled>
+                Generate AI Reply
+            </button>
+
+            <div id="replyPreview" class="reply-preview" hidden>
+                <div class="reply-preview-header">
+                    <h3>Generated Reply</h3>
+                    <span id="replyStatus"></span>
+                </div>
+
+                <textarea id="generatedReply" rows="10"></textarea>
+
+                <button id="createDraftButton" type="button" class="primary-button" disabled>
+                    Create Gmail Draft
+                </button>
+
+                <p id="draftStatus" class="draft-status"></p>
+
+                <button
+                    id="openDraftsButton"
+                    type="button"
+                    class="secondary-button"
+                    hidden
+                >
+                    Open Gmail Drafts
+                </button>
+            </div>
+
+        </section>
+
+        <section class="features">
+            <h2>Agent Features</h2>
+
+            <div class="feature">
+                <span>✓</span>
+                <p>Read email conversations</p>
+            </div>
+
+            <div class="feature">
+                <span>✓</span>
+                <p>Generate professional replies</p>
+            </div>
+
+            <div class="feature">
+                <span>✓</span>
+                <p>Create Gmail drafts</p>
+            </div>
+
+            <div class="feature">
+                <span>✓</span>
+                <p>Review replies before sending</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>Version 1.0.0</p>
+        </footer>
+
+    </main>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
